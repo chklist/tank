@@ -1,6 +1,6 @@
 # IntelliJ
-.idea
+/.idea/
 *.iml
-out/
-target/
-com/
+/out/
+/target/
+/com/
