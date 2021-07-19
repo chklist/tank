@@ -26,13 +26,6 @@ class GameModel {
         mainTank = new Tank(Direction.UP, this);
         // 初始化碰撞责任链
         colliderChain = new ColliderChain();
-        // 初始化敌军坦克
-        for (int i = 0; i < 5; i++) {
-            Tank badTank = new Tank(Direction.DOWN, this, Group.BAD, (i + 2) * 100, 50);
-            badTank.speed = 3;
-            badTank.setMoving(true);
-            gameRoles.add(badTank);
-        }
     }
 
     void paint(Graphics g) {
