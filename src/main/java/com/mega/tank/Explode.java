@@ -3,6 +3,7 @@ package com.mega.tank;
 import com.mega.tank.util.ResourceMgr;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class Explode extends GameRole {
 
@@ -15,13 +16,15 @@ public class Explode extends GameRole {
         this.gm = gm;
         this.x = x;
         this.y = y;
+
+        this.uuid = UUID.randomUUID();
     }
 
     @Override
     void paint(Graphics g) {
         g.drawImage(ResourceMgr.explodes[step++], x, y, null);
         if (step >= ResourceMgr.explodes.length)
-            gm.getGameRoles().remove(this);
+            gm.getGameRoles().remove(this.uuid);
     }
 
     @Override

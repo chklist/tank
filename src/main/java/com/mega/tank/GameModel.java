@@ -4,20 +4,21 @@ import com.mega.tank.collider.ColliderChain;
 import com.mega.tank.proxy.cglib.TimeMethodInterceptor;
 
 import java.awt.*;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 调停者模式
  */
-class GameModel {
+public class GameModel {
 
-    static GameModel INSTANCE = new GameModel();
+    public static GameModel INSTANCE = new GameModel();
 
     private Tank mainTank;
     private ColliderChain colliderChain;
 
-    private List<GameRole> gameRoles = new LinkedList<>();
+    private Map<UUID, GameRole> gameRoles = new ConcurrentHashMap<>();
 
     boolean bL = false, bU = false, bD = false, bR = false;
 
@@ -38,13 +39,17 @@ class GameModel {
 
         mainTank.paint(g);
 
-        for (int i = 0; i < gameRoles.size(); i++) {
-            gameRoles.get(i).paint(g);
+
+        Collection<GameRole> values = gameRoles.values();
+        for (GameRole gameRole : values) {
+            gameRole.paint(g);
         }
 
-        for (int i = 0; i < gameRoles.size(); i++) {
-            for (int j = i + 1; j < gameRoles.size(); j++) {
-                colliderChain.collide(gameRoles.get(i), gameRoles.get(j));
+        for (GameRole gr1 : values) {
+            for (GameRole gr2 : values) {
+                if (gr1.uuid != gr2.uuid) {
+                    colliderChain.collide(gr1, gr2);
+                }
             }
         }
     }
@@ -57,10 +62,15 @@ class GameModel {
         proxy.fire(() -> {
             Direction[] values = Direction.values();
             for (Direction value : values) {
-                gameRoles.add(new Bullet(value, this, this.mainTank));
+                Bullet bullet = new Bullet(value, this.mainTank);
+                gameRoles.put(bullet.uuid, bullet);
             }
             //gameRoles.add(new Bullet(tank.getDir(), tank.tf, tank));
         });
+    }
+
+    public Tank getMainTank() {
+        return mainTank;
     }
 
     void setMainTank() {
@@ -83,7 +93,7 @@ class GameModel {
         }
     }
 
-    List<GameRole> getGameRoles() {
+    public Map<UUID, GameRole> getGameRoles() {
         return gameRoles;
     }
 

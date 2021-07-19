@@ -1,9 +1,12 @@
 package com.mega.tank;
 
 import java.awt.*;
+import java.util.UUID;
 
 public abstract class GameRole implements Removable {
     private static final int DEFAULT_SPEED = 10;
+
+    UUID uuid;
 
     int speed = DEFAULT_SPEED;
 
@@ -37,15 +40,32 @@ public abstract class GameRole implements Removable {
         this.gm = gm;
     }
 
+    public Direction getDir() {
+        return dir;
+    }
+
     public void setDir(Direction dir) {
         this.dir = dir;
     }
+
+    public int getX() {
+        return x;
+    }
+
 
     public void setX(int x) {
         this.x = x;
     }
 
+    public int getY() {
+        return y;
+    }
+
     public void setY(int y) {
         this.y = y;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 }

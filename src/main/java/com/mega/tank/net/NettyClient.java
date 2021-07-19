@@ -1,8 +1,9 @@
 package com.mega.tank.net;
 
+import com.mega.tank.net.codec.MsgDecoder;
 import com.mega.tank.net.codec.MsgEncoder;
 import com.mega.tank.net.handler.ClientMsgHandler;
-import com.mega.tank.net.codec.MsgDecoder;
+import com.mega.tank.net.message.Msg;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -11,7 +12,12 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class NettyClient {
 
+    public static NettyClient INSTANCE = new NettyClient();
+
     private Channel channel;
+
+    private NettyClient() {
+    }
 
     public void connect(String host, int port) {
         EventLoopGroup group = new NioEventLoopGroup(1);
@@ -47,5 +53,9 @@ public class NettyClient {
         } finally {
             group.shutdownGracefully();
         }
+    }
+
+    public void send(Msg msg) {
+        channel.writeAndFlush(msg);
     }
 }

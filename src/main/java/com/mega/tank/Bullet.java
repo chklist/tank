@@ -3,6 +3,7 @@ package com.mega.tank;
 import com.mega.tank.util.ResourceMgr;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class Bullet extends GameRole {
     private static final int WIDTH = ResourceMgr.bulletUp.getWidth();
@@ -18,7 +19,7 @@ public class Bullet extends GameRole {
         this(dir, GameModel.INSTANCE, tank, tank.x + Tank.WIDTH / 2 - Bullet.WIDTH / 2, tank.y + Tank.HEIGHT / 2 - Bullet.HEIGHT / 2);
     }
 
-    Bullet(Direction dir, GameModel gm, Tank tank) {
+    private Bullet(Direction dir, GameModel gm, Tank tank) {
         this(dir, gm, tank, tank.x + Tank.WIDTH / 2 - Bullet.WIDTH / 2, tank.y + Tank.HEIGHT / 2 - Bullet.HEIGHT / 2);
     }
 
@@ -29,6 +30,7 @@ public class Bullet extends GameRole {
         this.x = x;
         this.y = y;
 
+        this.uuid = UUID.randomUUID();
         rect = new Rectangle(x, y, WIDTH, HEIGHT);
     }
 
@@ -38,14 +40,14 @@ public class Bullet extends GameRole {
         rect.x = this.x;
         rect.y = this.y;
         if (x < 0 || y < 0 || x > TankFrame.WIDTH || y > TankFrame.HEIGHT) {
-            gm.getGameRoles().remove(this);
+            gm.getGameRoles().remove(this.uuid);
         }
     }
 
     @Override
     public void paint(Graphics g) {
         if (!living) {
-            gm.getGameRoles().remove(this);
+            gm.getGameRoles().remove(this.uuid);
         }
 
         switch (dir) {

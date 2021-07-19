@@ -1,5 +1,7 @@
 package com.mega.tank;
 
+import com.mega.tank.net.NettyClient;
+
 public class TankMain {
     public static void main(String[] args) {
         TankFrame tf = new TankFrame(GameModel.INSTANCE);
@@ -15,6 +17,8 @@ public class TankMain {
                 tf.repaint();
             }
         }).start();
+
+        NettyClient.INSTANCE.connect("localhost", 8888);
 
     }
 }
