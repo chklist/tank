@@ -3,6 +3,7 @@ package com.mega.tank;
 import com.mega.tank.collider.ColliderChain;
 import com.mega.tank.net.NettyClient;
 import com.mega.tank.net.message.TankDirMsg;
+import com.mega.tank.net.message.TankFireMsg;
 import com.mega.tank.net.message.TankMovingMsg;
 import com.mega.tank.net.message.TankStopMsg;
 
@@ -29,7 +30,9 @@ public class GameModel {
 
     private GameModel() {
         // 初始化主坦克
-        mainTank = new Tank(Direction.UP);
+        int len = Group.values().length;
+        mainTank = new Tank(Direction.UP, this, Group.values()[random.nextInt(len)],
+                random.nextInt(TankFrame.WIDTH), random.nextInt(TankFrame.HEIGHT));
         // 初始化碰撞责任链
         colliderChain = new ColliderChain();
     }
@@ -59,6 +62,7 @@ public class GameModel {
     }
 
     void fire() {
+        if (!mainTank.isLiving()) return;
         // 获取代理对象 JDK
         // Fireable fireable = (Fireable) TimeHandler.newInstance(mainTank);
         // 获取代理对象 CGLIB
@@ -71,6 +75,7 @@ public class GameModel {
             }
             //gameRoles.add(new Bullet(tank.getDir(), tank.tf, tank));
         });
+        NettyClient.INSTANCE.send(new TankFireMsg(mainTank));
     }
 
     public Tank getMainTank() {
@@ -78,11 +83,15 @@ public class GameModel {
     }
 
     void setMainTank() {
+        if (!mainTank.isLiving()) {
+            return;
+        }
         // 获取坦克旧的方向
         Direction dir = mainTank.getDir();
 
         if (!bL && !bU && !bD && !bR) {
             mainTank.setMoving(false);
+            // 如果坦克停止，则发送TankStop消息
             NettyClient.INSTANCE.send(new TankStopMsg(mainTank));
         } else {
             if (bL) {
@@ -97,12 +106,13 @@ public class GameModel {
             if (bR) {
                 mainTank.dir = Direction.RIGHT;
             }
+            // 如果坦克从停止状态变成移动状态，则发送TankMoving消息
             if (!mainTank.isMoving()) {
                 NettyClient.INSTANCE.send(new TankMovingMsg(mainTank));
             }
             mainTank.setMoving(true);
 
-            // 如果坦克方向发生改变，则发生TankDir消息
+            // 如果坦克方向发生改变，则发送TankDir消息
             if (dir != mainTank.getDir()) {
                 NettyClient.INSTANCE.send(new TankDirMsg(mainTank));
             }

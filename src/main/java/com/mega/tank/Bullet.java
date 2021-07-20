@@ -15,7 +15,7 @@ public class Bullet extends GameRole {
 
     private boolean living = true;
 
-    Bullet(Direction dir, Tank tank) {
+    public Bullet(Direction dir, Tank tank) {
         this(dir, GameModel.INSTANCE, tank, tank.x + Tank.WIDTH / 2 - Bullet.WIDTH / 2, tank.y + Tank.HEIGHT / 2 - Bullet.HEIGHT / 2);
     }
 

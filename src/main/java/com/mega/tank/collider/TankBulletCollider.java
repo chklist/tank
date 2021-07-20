@@ -3,6 +3,8 @@ package com.mega.tank.collider;
 import com.mega.tank.Bullet;
 import com.mega.tank.GameRole;
 import com.mega.tank.Tank;
+import com.mega.tank.net.NettyClient;
+import com.mega.tank.net.message.TankDieMsg;
 
 public class TankBulletCollider extends Collider {
     @Override
@@ -14,6 +16,7 @@ public class TankBulletCollider extends Collider {
             if (tank.isLiving() && bullet.isLiving() && tank.getRect().intersects(bullet.getRect())) {
                 tank.die();
                 bullet.die();
+                NettyClient.INSTANCE.send(new TankDieMsg(tank));
                 isContinue = false;
             }
         } else if (gr1 instanceof Bullet && gr2 instanceof Tank) {

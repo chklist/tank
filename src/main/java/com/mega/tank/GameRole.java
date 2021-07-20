@@ -68,4 +68,16 @@ public abstract class GameRole implements Removable {
     public UUID getUuid() {
         return uuid;
     }
+
+    @Override
+    public String toString() {
+        return "GameRole{" +
+                "uuid=" + uuid +
+                ", speed=" + speed +
+                ", gm=" + gm +
+                ", dir=" + dir +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

@@ -28,14 +28,14 @@ public class Tank extends GameRole implements Fireable, Removable {
     }
 
     public Tank(Direction dir, Group group, int x, int y) {
-        this(dir, GameModel.INSTANCE, Group.GOOD, (TankFrame.WIDTH - 50) >> 1, 400);
+        this(dir, GameModel.INSTANCE, group, x, y);
     }
 
-    private Tank(Direction dir, GameModel gm) {
+    public Tank(Direction dir, GameModel gm) {
         this(dir, gm, Group.GOOD, (TankFrame.WIDTH - 50) >> 1, 400);
     }
 
-    private Tank(Direction dir, GameModel gm, Group group, int x, int y) {
+    public Tank(Direction dir, GameModel gm, Group group, int x, int y) {
         this.dir = dir;
         this.gm = gm;
         this.group = group;
@@ -78,6 +78,7 @@ public class Tank extends GameRole implements Fireable, Removable {
         int eX = x + Tank.WIDTH / 2 - Explode.WIDTH / 2;
         int eY = y + Tank.HEIGHT / 2 - Explode.HEIGHT / 2;
         Explode explode = new Explode(gm, eX, eY);
+        System.out.println(explode);
         gm.getGameRoles().put(explode.uuid, explode);
     }
 
@@ -95,24 +96,28 @@ public class Tank extends GameRole implements Fireable, Removable {
         rect.x = this.x;
         rect.y = this.y;
 
-        if (group == Group.BAD && random.nextInt(100) > 95) {
+        /*if (group == Group.BAD && random.nextInt(100) > 95) {
             this.fire(() -> {
                 Bullet bullet = new Bullet(dir, this);
                 gm.getGameRoles().put(bullet.uuid, bullet);
             });
             randomDir();
-        }
+        }*/
+        // 边界检测
         boundsCheck();
     }
 
     @Override
     public void paint(Graphics g) {
+        // 如果主坦克已死，退出画图
+        if (!living && uuid.equals(GameModel.INSTANCE.getMainTank().getUuid())) return;
+
         if (!living) {
             gm.getGameRoles().remove(this.getUuid());
         }
 
         Color c = g.getColor();
-        g.setColor(Color.GREEN);
+        g.setColor(group == Group.GOOD ? Color.GREEN : Color.RED);
         g.drawString(this.uuid.toString(), x - WIDTH / 2, y);
         g.setColor(c);
 
