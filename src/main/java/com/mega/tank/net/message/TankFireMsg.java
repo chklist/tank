@@ -1,9 +1,8 @@
 package com.mega.tank.net.message;
 
-import com.mega.tank.Bullet;
-import com.mega.tank.Direction;
 import com.mega.tank.GameModel;
 import com.mega.tank.Tank;
+import com.mega.tank.strategy.FourDirFireStrategy;
 import com.mega.tank.util.CloseUtil;
 
 import java.io.*;
@@ -29,15 +28,7 @@ public class TankFireMsg extends Msg {
         if (uuid.equals(GameModel.INSTANCE.getMainTank().getUuid())) return;
         Tank t = (Tank) GameModel.INSTANCE.getGameRoleByUuid(uuid);
         if (t != null) {
-            t.fire(() -> {
-                Direction[] values = Direction.values();
-                for (Direction value : values) {
-                    Bullet bullet = new Bullet(value, t);
-                    GameModel.INSTANCE.getGameRoles().put(bullet.getUuid(), bullet);
-                }
-                //gameRoles.add(new Bullet(tank.getDir(), tank.tf, tank));
-            });
-            ;
+            t.fire(new FourDirFireStrategy(t));
         }
     }
 

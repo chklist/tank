@@ -2,6 +2,8 @@ package com.mega.tank;
 
 import com.mega.tank.net.NettyClient;
 
+import java.util.concurrent.TimeUnit;
+
 public class TankMain {
     public static void main(String[] args) {
         TankFrame tf = new TankFrame(GameModel.INSTANCE);
@@ -10,7 +12,7 @@ public class TankMain {
         new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(25);
+                    TimeUnit.MILLISECONDS.sleep(25);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

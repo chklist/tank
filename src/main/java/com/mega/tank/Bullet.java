@@ -16,16 +16,11 @@ public class Bullet extends GameRole {
     private boolean living = true;
 
     public Bullet(Direction dir, Tank tank) {
-        this(dir, GameModel.INSTANCE, tank, tank.x + Tank.WIDTH / 2 - Bullet.WIDTH / 2, tank.y + Tank.HEIGHT / 2 - Bullet.HEIGHT / 2);
+        this(dir, tank, tank.x + Tank.WIDTH / 2 - Bullet.WIDTH / 2, tank.y + Tank.HEIGHT / 2 - Bullet.HEIGHT / 2);
     }
 
-    private Bullet(Direction dir, GameModel gm, Tank tank) {
-        this(dir, gm, tank, tank.x + Tank.WIDTH / 2 - Bullet.WIDTH / 2, tank.y + Tank.HEIGHT / 2 - Bullet.HEIGHT / 2);
-    }
-
-    private Bullet(Direction dir, GameModel gm, Tank tank, int x, int y) {
+    private Bullet(Direction dir, Tank tank, int x, int y) {
         this.dir = dir;
-        this.gm = gm;
         this.tank = tank;
         this.x = x;
         this.y = y;
@@ -40,14 +35,14 @@ public class Bullet extends GameRole {
         rect.x = this.x;
         rect.y = this.y;
         if (x < 0 || y < 0 || x > TankFrame.WIDTH || y > TankFrame.HEIGHT) {
-            gm.getGameRoles().remove(this.uuid);
+            GameModel.INSTANCE.getGameRoles().remove(this.uuid);
         }
     }
 
     @Override
     public void paint(Graphics g) {
         if (!living) {
-            gm.getGameRoles().remove(this.uuid);
+            GameModel.INSTANCE.getGameRoles().remove(this.uuid);
         }
 
         switch (dir) {

@@ -6,11 +6,9 @@ import java.util.UUID;
 public abstract class GameRole implements Removable {
     private static final int DEFAULT_SPEED = 10;
 
+    private int speed = DEFAULT_SPEED;
+
     UUID uuid;
-
-    int speed = DEFAULT_SPEED;
-
-    GameModel gm;
 
     Direction dir;
 
@@ -35,10 +33,6 @@ public abstract class GameRole implements Removable {
     }
 
     abstract void paint(Graphics graphics);
-
-    public void setGm(GameModel gm) {
-        this.gm = gm;
-    }
 
     public Direction getDir() {
         return dir;
@@ -74,7 +68,6 @@ public abstract class GameRole implements Removable {
         return "GameRole{" +
                 "uuid=" + uuid +
                 ", speed=" + speed +
-                ", gm=" + gm +
                 ", dir=" + dir +
                 ", x=" + x +
                 ", y=" + y +

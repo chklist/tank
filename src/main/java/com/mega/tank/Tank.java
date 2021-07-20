@@ -23,21 +23,8 @@ public class Tank extends GameRole implements Fireable, Removable {
 
     private Random random = new Random();
 
-    Tank(Direction dir) {
-        this(dir, GameModel.INSTANCE);
-    }
-
     public Tank(Direction dir, Group group, int x, int y) {
-        this(dir, GameModel.INSTANCE, group, x, y);
-    }
-
-    public Tank(Direction dir, GameModel gm) {
-        this(dir, gm, Group.GOOD, (TankFrame.WIDTH - 50) >> 1, 400);
-    }
-
-    public Tank(Direction dir, GameModel gm, Group group, int x, int y) {
         this.dir = dir;
-        this.gm = gm;
         this.group = group;
         this.x = x;
         this.y = y;
@@ -48,7 +35,6 @@ public class Tank extends GameRole implements Fireable, Removable {
 
     public Tank(TankJoinMsg msg) {
         this.dir = msg.getDir();
-        this.gm = GameModel.INSTANCE;
         this.group = msg.getGroup();
         this.x = msg.getX();
         this.y = msg.getY();
@@ -61,7 +47,7 @@ public class Tank extends GameRole implements Fireable, Removable {
         return group;
     }
 
-    public boolean isMoving() {
+    boolean isMoving() {
         return moving;
     }
 
@@ -77,8 +63,8 @@ public class Tank extends GameRole implements Fireable, Removable {
         living = false;
         int eX = x + Tank.WIDTH / 2 - Explode.WIDTH / 2;
         int eY = y + Tank.HEIGHT / 2 - Explode.HEIGHT / 2;
-        Explode explode = new Explode(gm, eX, eY);
-        gm.getGameRoles().put(explode.uuid, explode);
+        Explode explode = new Explode(eX, eY);
+        GameModel.INSTANCE.getGameRoles().put(explode.uuid, explode);
     }
 
     public Rectangle getRect() {
@@ -95,13 +81,6 @@ public class Tank extends GameRole implements Fireable, Removable {
         rect.x = this.x;
         rect.y = this.y;
 
-        /*if (group == Group.BAD && random.nextInt(100) > 95) {
-            this.fire(() -> {
-                Bullet bullet = new Bullet(dir, this);
-                gm.getGameRoles().put(bullet.uuid, bullet);
-            });
-            randomDir();
-        }*/
         // 边界检测
         boundsCheck();
     }
@@ -112,7 +91,7 @@ public class Tank extends GameRole implements Fireable, Removable {
         if (!living && uuid.equals(GameModel.INSTANCE.getMainTank().getUuid())) return;
 
         if (!living) {
-            gm.getGameRoles().remove(this.getUuid());
+            GameModel.INSTANCE.getGameRoles().remove(this.getUuid());
         }
 
         Color c = g.getColor();
@@ -140,11 +119,6 @@ public class Tank extends GameRole implements Fireable, Removable {
     @Override
     public void fire(FireStrategy fireStrategy) {
         fireStrategy.fire();
-    }
-
-    private void randomDir() {
-        int len = Direction.values().length;
-        this.dir = Direction.values()[random.nextInt(len)];
     }
 
     private void boundsCheck() {

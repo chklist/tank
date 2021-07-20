@@ -12,8 +12,7 @@ public class Explode extends GameRole {
 
     private int step = 0;
 
-    Explode(GameModel gm, int x, int y) {
-        this.gm = gm;
+    Explode(int x, int y) {
         this.x = x;
         this.y = y;
 
@@ -24,7 +23,7 @@ public class Explode extends GameRole {
     void paint(Graphics g) {
         g.drawImage(ResourceMgr.explodes[step++], x, y, null);
         if (step >= ResourceMgr.explodes.length)
-            gm.getGameRoles().remove(this.uuid);
+            GameModel.INSTANCE.getGameRoles().remove(this.uuid);
     }
 
     @Override

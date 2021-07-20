@@ -6,6 +6,7 @@ import com.mega.tank.net.message.TankDirMsg;
 import com.mega.tank.net.message.TankFireMsg;
 import com.mega.tank.net.message.TankMovingMsg;
 import com.mega.tank.net.message.TankStopMsg;
+import com.mega.tank.strategy.FourDirFireStrategy;
 
 import java.awt.*;
 import java.util.List;
@@ -29,11 +30,12 @@ public class GameModel {
     private Random random = new Random();
 
     private GameModel() {
-        // 初始化主坦克
-        int len = Group.values().length;
+        // 初始化主坦克 随机Group，随机位置
+        Group group = randomGroup();
         int x = Math.min(Math.max(random.nextInt(TankFrame.WIDTH), 2), TankFrame.WIDTH - Tank.WIDTH - 2);
         int y = Math.min(Math.max(random.nextInt(TankFrame.HEIGHT), 25), TankFrame.HEIGHT - Tank.HEIGHT - 2);
-        mainTank = new Tank(Direction.UP, this, Group.values()[random.nextInt(len)], x, y);
+        mainTank = new Tank(Direction.UP, group, x, y);
+
         // 初始化碰撞责任链
         colliderChain = new ColliderChain();
     }
@@ -41,7 +43,7 @@ public class GameModel {
     void paint(Graphics g) {
         Color c = g.getColor();
         g.setColor(Color.WHITE);
-        g.drawString("Bad Tank Num: " + getBadTanks().size(), 10, 60);
+        g.drawString("Tank Num: " + getTanks().size(), 10, 60);
         g.drawString("Bullet Num: " + getBullets().size(), 10, 80);
         g.drawString("Explode Num: " + getExplodes().size(), 10, 100);
         g.setColor(c);
@@ -68,14 +70,7 @@ public class GameModel {
         // Fireable fireable = (Fireable) TimeHandler.newInstance(mainTank);
         // 获取代理对象 CGLIB
         //Tank proxy = (Tank) TimeMethodInterceptor.newInstance(mainTank);
-        mainTank.fire(() -> {
-            Direction[] values = Direction.values();
-            for (Direction value : values) {
-                Bullet bullet = new Bullet(value, this.mainTank);
-                gameRoles.put(bullet.uuid, bullet);
-            }
-            //gameRoles.add(new Bullet(tank.getDir(), tank.tf, tank));
-        });
+        mainTank.fire(new FourDirFireStrategy(mainTank));
         NettyClient.INSTANCE.send(new TankFireMsg(mainTank));
     }
 
@@ -128,15 +123,20 @@ public class GameModel {
         return gameRoles.get(uuid);
     }
 
-    private List<Tank> getBadTanks() {
-        List<Tank> badTanks = new LinkedList<>();
+    private Group randomGroup() {
+        int len = Group.values().length;
+        return Group.values()[random.nextInt(len)];
+    }
+
+    private List<Tank> getTanks() {
+        List<Tank> tanks = new LinkedList<>();
         Collection<GameRole> values = gameRoles.values();
         for (GameRole value : values) {
             if (value instanceof Tank) {
-                badTanks.add((Tank) value);
+                tanks.add((Tank) value);
             }
         }
-        return badTanks;
+        return tanks;
     }
 
     private List<Bullet> getBullets() {

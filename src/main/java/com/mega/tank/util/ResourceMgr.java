@@ -22,9 +22,9 @@ public class ResourceMgr {
             bulletLeft = ImageUtil.rotateImage(bulletUp, -90);
             bulletRight = ImageUtil.rotateImage(bulletUp, 90);
 
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 16; i++) {
                 explodes[i] = ImageIO.read(Objects.requireNonNull(ResourceMgr.class.getClassLoader().getResourceAsStream("images/e" + (i + 1) + ".gif")));
-
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

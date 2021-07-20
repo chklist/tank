@@ -14,15 +14,17 @@ public class TankFrame extends Frame {
     static final int HEIGHT = 600;
 
     /**
-     * 门面（Facade）模式
+     * 门面（Facade）模式： 抽象出游戏模型 由该模型负责和各个游戏角色交互，把界面和业务逻辑解耦（MVC）
      */
     private GameModel gm;
 
+    private Image offScreenImage;
+
     TankFrame(GameModel gm) {
+        this.gm = gm;
+
         setTitle("Tank War");
         setResizable(false);
-
-        this.gm = gm;
 
         // 设置窗口位置屏幕居中显示，设置窗口大小
         int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -43,8 +45,11 @@ public class TankFrame extends Frame {
         });
     }
 
-    private Image offScreenImage;
-
+    /**
+     * 消除闪烁问题
+     *
+     * @param g 画笔
+     */
     @Override
     public void update(Graphics g) {
         if (offScreenImage == null) {
@@ -64,7 +69,12 @@ public class TankFrame extends Frame {
         gm.paint(g);
     }
 
-    class MyKeyListener extends KeyAdapter {
+    private class MyKeyListener extends KeyAdapter {
+        /**
+         * 当键盘按下去时调用该方法
+         *
+         * @param e 键盘事件
+         */
         @Override
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
@@ -88,6 +98,11 @@ public class TankFrame extends Frame {
             }
         }
 
+        /**
+         * 当键盘放开时调用该方法
+         *
+         * @param e 键盘事件
+         */
         @Override
         public void keyReleased(KeyEvent e) {
             int key = e.getKeyCode();
