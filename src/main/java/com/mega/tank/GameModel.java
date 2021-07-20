@@ -26,13 +26,14 @@ public class GameModel {
 
     boolean bL = false, bU = false, bD = false, bR = false;
 
-    Random random = new Random();
+    private Random random = new Random();
 
     private GameModel() {
         // 初始化主坦克
         int len = Group.values().length;
-        mainTank = new Tank(Direction.UP, this, Group.values()[random.nextInt(len)],
-                random.nextInt(TankFrame.WIDTH), random.nextInt(TankFrame.HEIGHT));
+        int x = Math.min(Math.max(random.nextInt(TankFrame.WIDTH), 2), TankFrame.WIDTH - Tank.WIDTH - 2);
+        int y = Math.min(Math.max(random.nextInt(TankFrame.HEIGHT), 25), TankFrame.HEIGHT - Tank.HEIGHT - 2);
+        mainTank = new Tank(Direction.UP, this, Group.values()[random.nextInt(len)], x, y);
         // 初始化碰撞责任链
         colliderChain = new ColliderChain();
     }

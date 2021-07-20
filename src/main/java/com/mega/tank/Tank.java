@@ -78,7 +78,6 @@ public class Tank extends GameRole implements Fireable, Removable {
         int eX = x + Tank.WIDTH / 2 - Explode.WIDTH / 2;
         int eY = y + Tank.HEIGHT / 2 - Explode.HEIGHT / 2;
         Explode explode = new Explode(gm, eX, eY);
-        System.out.println(explode);
         gm.getGameRoles().put(explode.uuid, explode);
     }
 

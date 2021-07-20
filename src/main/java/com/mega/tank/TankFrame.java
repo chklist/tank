@@ -1,5 +1,8 @@
 package com.mega.tank;
 
+import com.mega.tank.net.NettyClient;
+import com.mega.tank.net.message.TankDieMsg;
+
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -33,6 +36,8 @@ public class TankFrame extends Frame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                gm.getMainTank().die();
+                NettyClient.INSTANCE.send(new TankDieMsg(gm.getMainTank()));
                 System.exit(0);
             }
         });

@@ -9,8 +9,12 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NettyClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(NettyClient.class);
 
     public static NettyClient INSTANCE = new NettyClient();
 
@@ -41,7 +45,7 @@ public class NettyClient {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        System.out.println("客户端连接成功");
+                        logger.info("client connect success");
                         channel = future.channel();
                     }
                 }
@@ -56,6 +60,8 @@ public class NettyClient {
     }
 
     public void send(Msg msg) {
-        channel.writeAndFlush(msg);
+        if (channel != null) {
+            channel.writeAndFlush(msg);
+        }
     }
 }

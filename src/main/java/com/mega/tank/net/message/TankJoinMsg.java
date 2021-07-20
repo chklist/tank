@@ -34,14 +34,11 @@ public class TankJoinMsg extends Msg {
     @Override
     public void handle() {
         GameModel gm = GameModel.INSTANCE;
-        System.out.println(uuid.equals(gm.getMainTank().getUuid()) || gm.getGameRoles().containsKey(uuid));
         if (uuid.equals(gm.getMainTank().getUuid()) || gm.getGameRoles().containsKey(uuid)) {
             return;
         }
         Tank tank = new Tank(this);
         gm.getGameRoles().put(tank.getUuid(), tank);
-        System.out.println(gm.getGameRoles().size());
-
         NettyClient.INSTANCE.send(new TankJoinMsg(GameModel.INSTANCE.getMainTank()));
     }
 
