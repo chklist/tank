@@ -25,9 +25,9 @@ public class GameModel {
 
     private Map<UUID, GameRole> gameRoles = new ConcurrentHashMap<>();
 
-    boolean bL = false, bU = false, bD = false, bR = false;
-
     private Random random = new Random();
+
+    boolean bL = false, bU = false, bD = false, bR = false;
 
     private GameModel() {
         // 初始化主坦克 随机Group，随机位置
