@@ -23,22 +23,19 @@ public class Tank extends GameRole implements Fireable, Removable {
 
     private Random random = new Random();
 
-    /**
-     * CGLIB 需要一个空构造器
-     */
-    Tank() {
-        this(Direction.UP);
-    }
-
     Tank(Direction dir) {
         this(dir, GameModel.INSTANCE);
     }
 
-    Tank(Direction dir, GameModel gm) {
+    public Tank(Direction dir, Group group, int x, int y) {
+        this(dir, GameModel.INSTANCE, Group.GOOD, (TankFrame.WIDTH - 50) >> 1, 400);
+    }
+
+    private Tank(Direction dir, GameModel gm) {
         this(dir, gm, Group.GOOD, (TankFrame.WIDTH - 50) >> 1, 400);
     }
 
-    public Tank(Direction dir, GameModel gm, Group group, int x, int y) {
+    private Tank(Direction dir, GameModel gm, Group group, int x, int y) {
         this.dir = dir;
         this.gm = gm;
         this.group = group;
@@ -64,7 +61,11 @@ public class Tank extends GameRole implements Fireable, Removable {
         return group;
     }
 
-    void setMoving(boolean moving) {
+    public boolean isMoving() {
+        return moving;
+    }
+
+    public void setMoving(boolean moving) {
         this.moving = moving;
     }
 
@@ -109,6 +110,12 @@ public class Tank extends GameRole implements Fireable, Removable {
         if (!living) {
             gm.getGameRoles().remove(this.getUuid());
         }
+
+        Color c = g.getColor();
+        g.setColor(Color.GREEN);
+        g.drawString(this.uuid.toString(), x - WIDTH / 2, y);
+        g.setColor(c);
+
         switch (dir) {
             case LEFT:
                 g.drawImage(ResourceMgr.tankLeft, x, y, null);
@@ -132,7 +139,8 @@ public class Tank extends GameRole implements Fireable, Removable {
     }
 
     private void randomDir() {
-        this.dir = Direction.values()[random.nextInt(4)];
+        int len = Direction.values().length;
+        this.dir = Direction.values()[random.nextInt(len)];
     }
 
     private void boundsCheck() {

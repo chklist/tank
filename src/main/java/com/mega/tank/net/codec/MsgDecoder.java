@@ -33,6 +33,7 @@ public class MsgDecoder extends ByteToMessageDecoder {
         byte[] bytes = new byte[len];
         in.readBytes(bytes);
 
+        // 根据消息类型创建对应的消息对象
         Class<?> clz = Class.forName(MSG_CLASS_PACKAGE + "." + msgType.name() + MSG_CLASS_SUFFIX);
         Msg msg = (Msg) clz.getDeclaredConstructor().newInstance();
         msg.parse(bytes);

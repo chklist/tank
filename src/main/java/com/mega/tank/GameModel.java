@@ -1,7 +1,10 @@
 package com.mega.tank;
 
 import com.mega.tank.collider.ColliderChain;
-import com.mega.tank.proxy.cglib.TimeMethodInterceptor;
+import com.mega.tank.net.NettyClient;
+import com.mega.tank.net.message.TankDirMsg;
+import com.mega.tank.net.message.TankMovingMsg;
+import com.mega.tank.net.message.TankStopMsg;
 
 import java.awt.*;
 import java.util.List;
@@ -22,9 +25,11 @@ public class GameModel {
 
     boolean bL = false, bU = false, bD = false, bR = false;
 
+    Random random = new Random();
+
     private GameModel() {
-        // 初始化红军坦克
-        mainTank = new Tank(Direction.UP, this);
+        // 初始化主坦克
+        mainTank = new Tank(Direction.UP);
         // 初始化碰撞责任链
         colliderChain = new ColliderChain();
     }
@@ -38,7 +43,6 @@ public class GameModel {
         g.setColor(c);
 
         mainTank.paint(g);
-
 
         Collection<GameRole> values = gameRoles.values();
         for (GameRole gameRole : values) {
@@ -58,8 +62,8 @@ public class GameModel {
         // 获取代理对象 JDK
         // Fireable fireable = (Fireable) TimeHandler.newInstance(mainTank);
         // 获取代理对象 CGLIB
-        Tank proxy = (Tank) TimeMethodInterceptor.newInstance(mainTank);
-        proxy.fire(() -> {
+        //Tank proxy = (Tank) TimeMethodInterceptor.newInstance(mainTank);
+        mainTank.fire(() -> {
             Direction[] values = Direction.values();
             for (Direction value : values) {
                 Bullet bullet = new Bullet(value, this.mainTank);
@@ -74,8 +78,12 @@ public class GameModel {
     }
 
     void setMainTank() {
+        // 获取坦克旧的方向
+        Direction dir = mainTank.getDir();
+
         if (!bL && !bU && !bD && !bR) {
             mainTank.setMoving(false);
+            NettyClient.INSTANCE.send(new TankStopMsg(mainTank));
         } else {
             if (bL) {
                 mainTank.dir = Direction.LEFT;
@@ -89,7 +97,15 @@ public class GameModel {
             if (bR) {
                 mainTank.dir = Direction.RIGHT;
             }
+            if (!mainTank.isMoving()) {
+                NettyClient.INSTANCE.send(new TankMovingMsg(mainTank));
+            }
             mainTank.setMoving(true);
+
+            // 如果坦克方向发生改变，则发生TankDir消息
+            if (dir != mainTank.getDir()) {
+                NettyClient.INSTANCE.send(new TankDirMsg(mainTank));
+            }
         }
     }
 
@@ -97,11 +113,16 @@ public class GameModel {
         return gameRoles;
     }
 
+    public GameRole getGameRoleByUuid(UUID uuid) {
+        return gameRoles.get(uuid);
+    }
+
     private List<Tank> getBadTanks() {
         List<Tank> badTanks = new LinkedList<>();
-        for (int i = 0; i < gameRoles.size(); i++) {
-            if (gameRoles.get(i) instanceof Tank) {
-                badTanks.add((Tank) gameRoles.get(i));
+        Collection<GameRole> values = gameRoles.values();
+        for (GameRole value : values) {
+            if (value instanceof Tank) {
+                badTanks.add((Tank) value);
             }
         }
         return badTanks;
@@ -109,9 +130,10 @@ public class GameModel {
 
     private List<Bullet> getBullets() {
         List<Bullet> bullets = new LinkedList<>();
-        for (int i = 0; i < gameRoles.size(); i++) {
-            if (gameRoles.get(i) instanceof Bullet) {
-                bullets.add((Bullet) gameRoles.get(i));
+        Collection<GameRole> values = gameRoles.values();
+        for (GameRole value : values) {
+            if (value instanceof Bullet) {
+                bullets.add((Bullet) value);
             }
         }
         return bullets;
@@ -119,9 +141,10 @@ public class GameModel {
 
     private List<Explode> getExplodes() {
         List<Explode> explodes = new LinkedList<>();
-        for (int i = 0; i < gameRoles.size(); i++) {
-            if (gameRoles.get(i) instanceof Explode) {
-                explodes.add((Explode) gameRoles.get(i));
+        Collection<GameRole> values = gameRoles.values();
+        for (GameRole value : values) {
+            if (value instanceof Explode) {
+                explodes.add((Explode) value);
             }
         }
         return explodes;
