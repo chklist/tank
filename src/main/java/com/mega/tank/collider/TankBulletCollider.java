@@ -1,8 +1,8 @@
 package com.mega.tank.collider;
 
-import com.mega.tank.Bullet;
-import com.mega.tank.GameRole;
-import com.mega.tank.Tank;
+import com.mega.tank.role.Bullet;
+import com.mega.tank.role.Tank;
+import com.mega.tank.role.GameRole;
 
 public class TankBulletCollider extends Collider {
     @Override
@@ -11,7 +11,8 @@ public class TankBulletCollider extends Collider {
             Tank tank = (Tank) gr1;
             Bullet bullet = (Bullet) gr2;
             if (tank.getGroup() == bullet.getTank().getGroup()) return;
-            if (tank.isLiving() && bullet.isLiving() && tank.getRect().intersects(bullet.getRect())) {
+            if (tank.isLiving() && bullet.isLiving()
+                    && tank.getRect().intersects(bullet.getRect())) {
                 tank.die();
                 bullet.die();
                 isContinue = false;

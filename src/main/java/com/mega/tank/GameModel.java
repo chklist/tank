@@ -1,18 +1,26 @@
 package com.mega.tank;
 
 import com.mega.tank.collider.ColliderChain;
-import com.mega.tank.proxy.cglib.TimeMethodInterceptor;
+import com.mega.tank.role.*;
+import com.mega.tank.role.simple.SimpleTank;
+import com.mega.tank.strategy.FourDirFireStrategy;
+import com.mega.tank.util.PropertyMgr;
 
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 调停者模式
  */
-class GameModel {
+public class GameModel {
 
-    static GameModel INSTANCE = new GameModel();
+    private static GameModel INSTANCE = new GameModel();
+
+    private final static String BAD_TANK_CNT_KEY = "tank.bad.count";
+    private static final String GAME_ROLE_FACTORY = "game.role.factory";
 
     private Tank mainTank;
     private ColliderChain colliderChain;
@@ -21,18 +29,31 @@ class GameModel {
 
     boolean bL = false, bU = false, bD = false, bR = false;
 
+    public final GameRoleFactory factory = getFactory();
+
     private GameModel() {
+    }
+
+    GameModel init() {
+        Random random = new Random();
         // 初始化红军坦克
-        mainTank = new Tank(Direction.UP, this);
+        mainTank = factory.createTank(Direction.UP);
         // 初始化碰撞责任链
         colliderChain = new ColliderChain();
         // 初始化敌军坦克
-        for (int i = 0; i < 5; i++) {
-            Tank badTank = new Tank(Direction.DOWN, this, Group.BAD, (i + 2) * 100, 50);
-            badTank.speed = 3;
+        int initBadTankCnt = PropertyMgr.getInstance().getInt(BAD_TANK_CNT_KEY);
+
+        for (int i = 0; i < initBadTankCnt; i++) {
+            Tank badTank = factory.createTank(Direction.DOWN, Group.BAD, random.nextInt(800), random.nextInt(300));
+            badTank.setSpeed(3);
             badTank.setMoving(true);
             gameRoles.add(badTank);
         }
+        return this;
+    }
+
+    public static GameModel getInstance() {
+        return INSTANCE;
     }
 
     void paint(Graphics g) {
@@ -57,17 +78,9 @@ class GameModel {
     }
 
     void fire() {
-        // 获取代理对象 JDK
+        // 获取代理对象
         // Fireable fireable = (Fireable) TimeHandler.newInstance(mainTank);
-        // 获取代理对象 CGLIB
-        Tank proxy = (Tank) TimeMethodInterceptor.newInstance(mainTank);
-        proxy.fire(() -> {
-            Direction[] values = Direction.values();
-            for (Direction value : values) {
-                gameRoles.add(new Bullet(value, this, this.mainTank));
-            }
-            //gameRoles.add(new Bullet(tank.getDir(), tank.tf, tank));
-        });
+        mainTank.fire(new FourDirFireStrategy(factory));
     }
 
     void setMainTank() {
@@ -75,34 +88,44 @@ class GameModel {
             mainTank.setMoving(false);
         } else {
             if (bL) {
-                mainTank.dir = Direction.LEFT;
+                mainTank.setDir(Direction.LEFT);
             }
             if (bU) {
-                mainTank.dir = Direction.UP;
+                mainTank.setDir(Direction.UP);
             }
             if (bD) {
-                mainTank.dir = Direction.DOWN;
+                mainTank.setDir(Direction.DOWN);
             }
             if (bR) {
-                mainTank.dir = Direction.RIGHT;
+                mainTank.setDir(Direction.RIGHT);
             }
             mainTank.setMoving(true);
         }
     }
 
-    List<GameRole> getGameRoles() {
+    public List<GameRole> getGameRoles() {
         return gameRoles;
     }
 
-    private List<Tank> getBadTanks() {
-        List<Tank> badTanks = new LinkedList<>();
+    private List<SimpleTank> getBadTanks() {
+        List<SimpleTank> badTanks = new LinkedList<>();
         for (int i = 0; i < gameRoles.size(); i++) {
-            if (gameRoles.get(i) instanceof Tank) {
-                badTanks.add((Tank) gameRoles.get(i));
+            if (gameRoles.get(i) instanceof SimpleTank) {
+                badTanks.add((SimpleTank) gameRoles.get(i));
             }
         }
         return badTanks;
     }
+
+    public void add(GameRole gameRole) {
+        gameRoles.add(gameRole);
+    }
+
+    public void remove(GameRole gameRole) {
+        gameRoles.remove(gameRole);
+    }
+
+
 
     private List<Bullet> getBullets() {
         List<Bullet> bullets = new LinkedList<>();
@@ -122,5 +145,18 @@ class GameModel {
             }
         }
         return explodes;
+    }
+
+    private GameRoleFactory getFactory() {
+        GameRoleFactory factory = null;
+        String factoryName = PropertyMgr.getInstance().getString(GAME_ROLE_FACTORY);
+        try {
+            Class<?> clz = Class.forName(factoryName);
+            Method method = clz.getMethod("getInstance");
+            factory = (GameRoleFactory) method.invoke(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return factory;
     }
 }

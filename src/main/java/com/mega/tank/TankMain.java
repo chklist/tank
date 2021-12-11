@@ -2,7 +2,8 @@ package com.mega.tank;
 
 public class TankMain {
     public static void main(String[] args) {
-        TankFrame tf = new TankFrame(GameModel.INSTANCE);
+        GameModel gm = GameModel.getInstance().init();
+        TankFrame tf = new TankFrame(gm);
         tf.setVisible(true);
 
         new Thread(() -> {
@@ -16,5 +17,7 @@ public class TankMain {
             }
         }).start();
 
+        // 添加背景音乐
+        // new Thread(() -> new Audio("audio/bg_music.wav").loop()).start();
     }
 }

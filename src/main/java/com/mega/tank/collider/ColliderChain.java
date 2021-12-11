@@ -1,6 +1,6 @@
 package com.mega.tank.collider;
 
-import com.mega.tank.GameRole;
+import com.mega.tank.role.GameRole;
 import com.mega.tank.util.PropertyMgr;
 
 import java.util.LinkedList;
@@ -17,7 +17,7 @@ public class ColliderChain extends Collider {
     }
 
     private void init() {
-        String value = (String) PropertyMgr.getInstance().get(PROP_KEY_NAME);
+        String value = PropertyMgr.getInstance().getString(PROP_KEY_NAME);
         for (String clzName : value.split(",")) {
             try {
                 Collider collider = (Collider) Class.forName(clzName).getDeclaredConstructor().newInstance();

@@ -14,6 +14,12 @@
             <artifactId>cglib</artifactId>
             <version>3.2.12</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.2.18.RELEASE</version>
+        </dependency>
     </dependencies>
 
     <build>

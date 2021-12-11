@@ -1,7 +1,6 @@
 package com.mega.tank.util;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -34,8 +33,11 @@ public class PropertyMgr {
         return properties.get(key);
     }
 
-    public static void main(String[] args) {
-        String colliders = (String) PropertyMgr.getInstance().get("colliders");
-        System.out.println(Arrays.toString(colliders.split(",")));
+    public String getString(String key) {
+        return (String) get(key);
+    }
+
+    public int getInt(String key) {
+        return Integer.parseInt(getString(key));
     }
 }
